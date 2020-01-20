@@ -140,6 +140,17 @@ describe UserAgentParser::Version do
       assert_operator version, :>, '1.2.2'
       assert_operator version, :>, '1.1'
     end
+
+    it 'is correctly comparing versions with different lengths' do
+      version = UserAgentParser::Version.new('1.42.3')
+
+      assert_operator version, :<, '1.142'
+      assert_operator version, :<, '1.42.4'
+      assert_operator version, :>=, '1.42'
+      assert_operator version, :>, '1.14'
+      assert_operator version, :>, '1.7'
+      assert_operator version, :>, '1.3'
+    end
   end
 
   describe '#inspect' do
