@@ -59,9 +59,7 @@ module UserAgentParser
       range = [segments.size, other.segments.size].min - 1
 
       (0..range).each do |i|
-        if segments[i] != other.segments[i]
-          return int_compare(segments[i], other.segments[i])
-        end
+        return int_compare(segments[i], other.segments[i]) if segments[i] != other.segments[i]
       end
 
       0
@@ -90,7 +88,7 @@ module UserAgentParser
 
     def int_compare(s_segment, o_segment)
       Integer(s_segment).<=>Integer(o_segment)
-    rescue
+    rescue ArgumentError, TypeError
       s_segment.<=>(o_segment)
     end
   end
