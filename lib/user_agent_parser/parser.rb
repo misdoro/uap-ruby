@@ -4,6 +4,8 @@ require 'yaml'
 
 module UserAgentParser
   class Parser
+    extend Gem::Deprecate
+
     FAMILY_REPLACEMENT_KEYS = %w[
       family_replacement
       v1_replacement
@@ -22,11 +24,15 @@ module UserAgentParser
 
     private_constant :FAMILY_REPLACEMENT_KEYS, :OS_REPLACEMENT_KEYS
 
-    attr_reader :patterns_path
+    attr_reader :patterns_paths
 
-    def initialize(patterns_path: nil)
-      @patterns_path = patterns_path || UserAgentParser::DefaultPatternsPath
-      @ua_patterns, @os_patterns, @device_patterns = load_patterns(@patterns_path)
+    def initialize(patterns_path: nil, patterns_paths: [])
+      @patterns_paths = [patterns_path, *patterns_paths].compact
+      if @patterns_paths.empty?
+        @patterns_paths = [UserAgentParser::DefaultPatternsPath]
+      end
+
+      @ua_patterns, @os_patterns, @device_patterns = load_patterns(@patterns_paths)
     end
 
     def parse(user_agent)
@@ -35,9 +41,24 @@ module UserAgentParser
       parse_ua(user_agent, os, device)
     end
 
+    def patterns_path
+      patterns_paths.first
+    end
+    deprecate :patterns_path, :patterns_paths, 2020, 12
+
     private
 
-    def load_patterns(path)
+    def load_patterns(patterns_paths)
+      patterns_paths.inject([[], [], []]) do |patterns, path|
+        ua_patterns, os_patterns, device_patterns = load_patterns_file(path)
+        patterns[0] += ua_patterns
+        patterns[1] += os_patterns
+        patterns[2] += device_patterns
+        patterns
+      end
+    end
+
+    def load_patterns_file(path)
       yml = YAML.load_file(path)
 
       # Parse all the regexs
