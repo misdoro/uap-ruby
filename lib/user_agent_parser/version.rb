@@ -60,7 +60,7 @@ module UserAgentParser
 
       (0..range).each do |i|
         if segments[i] != other.segments[i]
-          return segments[i].<=> other.segments[i]
+          return int_compare(segments[i], other.segments[i])
         end
       end
 
@@ -86,6 +86,12 @@ module UserAgentParser
     def normalize_version(version)
       version if version.is_a?(Version)
       Version.new(version.to_s)
+    end
+
+    def int_compare(s_segment, o_segment)
+      Integer(s_segment).<=>Integer(o_segment)
+    rescue
+      s_segment.<=>(o_segment)
     end
   end
 end

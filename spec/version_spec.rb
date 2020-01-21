@@ -151,6 +151,16 @@ describe UserAgentParser::Version do
       assert_operator version, :>, '1.7'
       assert_operator version, :>, '1.3'
     end
+
+    it 'does its best to compare string versions' do
+      version = UserAgentParser::Version.new('1.2.3.a')
+
+      assert_operator version, :<, '1.2.4'
+      assert_operator version, :<, '1.2.3.b'
+      assert_operator version, :<, '1.2.3.p1'
+      assert_operator version, :<, '1.2.3.p0'
+      assert_operator version, :>, '1.2.2'
+    end
   end
 
   describe '#inspect' do
