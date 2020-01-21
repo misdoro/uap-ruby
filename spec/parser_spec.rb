@@ -77,6 +77,9 @@ describe UserAgentParser::Parser do
       parser = UserAgentParser::Parser.new(patterns_path: custom_patterns_path)
       ua = parser.parse('Any user agent string')
 
+      _(parser.patterns_paths).must_equal([custom_patterns_path])
+      _(parser.patterns_path).must_equal(custom_patterns_path)
+
       _(ua.family).must_equal('Custom browser')
       _(ua.version.major).must_equal('1')
       _(ua.version.minor).must_equal('2')
@@ -91,7 +94,11 @@ describe UserAgentParser::Parser do
     end
 
     it 'accepts pattern_paths array' do
-      parser = UserAgentParser::Parser.new(patterns_paths: [custom_patterns_path, other_patterns_path])
+      patterns_paths = [custom_patterns_path, other_patterns_path]
+      parser = UserAgentParser::Parser.new(patterns_paths: patterns_paths)
+
+      _(parser.patterns_paths).must_equal(patterns_paths)
+      _(parser.patterns_path).must_equal(custom_patterns_path)
 
       ua = parser.parse('Any user agent string')
       oua = parser.parse('Other user agent string')

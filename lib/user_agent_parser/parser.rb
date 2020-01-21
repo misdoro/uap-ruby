@@ -28,9 +28,7 @@ module UserAgentParser
 
     def initialize(patterns_path: nil, patterns_paths: [])
       @patterns_paths = [patterns_path, *patterns_paths].compact
-      if @patterns_paths.empty?
-        @patterns_paths = [UserAgentParser::DefaultPatternsPath]
-      end
+      @patterns_paths = [UserAgentParser::DefaultPatternsPath] if @patterns_paths.empty?
 
       @ua_patterns, @os_patterns, @device_patterns = load_patterns(@patterns_paths)
     end
@@ -49,12 +47,11 @@ module UserAgentParser
     private
 
     def load_patterns(patterns_paths)
-      patterns_paths.inject([[], [], []]) do |patterns, path|
+      patterns_paths.each_with_object([[], [], []]) do |path, patterns|
         ua_patterns, os_patterns, device_patterns = load_patterns_file(path)
         patterns[0] += ua_patterns
         patterns[1] += os_patterns
         patterns[2] += device_patterns
-        patterns
       end
     end
 
@@ -103,9 +100,7 @@ module UserAgentParser
 
     def first_pattern_match(patterns, value)
       patterns.each do |pattern|
-        if pattern[:regex].match?(value)
-          return [pattern, pattern[:regex].match(value)]
-        end
+        return [pattern, pattern[:regex].match(value)] if pattern[:regex].match?(value)
       end
       nil
     end
