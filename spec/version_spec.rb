@@ -76,11 +76,6 @@ describe UserAgentParser::Version do
       version = UserAgentParser::Version.new('1.2.3')
       _(version).wont_equal UserAgentParser::Version.new('1.2.2')
     end
-
-    it 'returns true for versions with different precision' do
-      version = UserAgentParser::Version.new('1.2.3')
-      _(version).must_equal UserAgentParser::Version.new('1')
-    end
   end
 
   describe '#<=>' do
@@ -104,7 +99,6 @@ describe UserAgentParser::Version do
       version = UserAgentParser::Version.new('1.2.3')
 
       assert_operator version, :<, '2'
-      assert_operator version, :<=, '1'
       assert_operator version, :>=, '1'
       assert_operator version, :>, '0'
     end
@@ -114,7 +108,6 @@ describe UserAgentParser::Version do
 
       assert_operator version, :<, '2.0'
       assert_operator version, :<, '1.3'
-      assert_operator version, :<=, '1.2'
       assert_operator version, :>=, '1.2'
       assert_operator version, :>, '1.1'
       assert_operator version, :>, '0.1'

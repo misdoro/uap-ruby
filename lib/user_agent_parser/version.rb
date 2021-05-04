@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'rubygems/version'
+
 module UserAgentParser
   class Version
     include Comparable
@@ -47,22 +49,8 @@ module UserAgentParser
         version == other.version
     end
 
-    def ==(other)
-      other = normalize_version(other)
-
-      self.<=>(other).zero?
-    end
-
     def <=>(other)
-      other = normalize_version(other)
-
-      range = [segments.size, other.segments.size].min - 1
-
-      (0..range).each do |i|
-        return int_compare(segments[i], other.segments[i]) if segments[i] != other.segments[i]
-      end
-
-      0
+      Gem::Version.new(version).<=>(Gem::Version.new(other.to_s))
     end
 
     def segments
@@ -77,19 +65,6 @@ module UserAgentParser
         patch: patch,
         patch_minor: patch_minor
       }
-    end
-
-    private
-
-    def normalize_version(version)
-      version if version.is_a?(Version)
-      Version.new(version.to_s)
-    end
-
-    def int_compare(s_segment, o_segment)
-      Integer(s_segment).<=>Integer(o_segment)
-    rescue ArgumentError, TypeError
-      s_segment.<=>(o_segment)
     end
   end
 end
